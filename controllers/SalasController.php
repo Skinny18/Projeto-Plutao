@@ -147,8 +147,7 @@ class SalasController extends Controller
     {
 
         $model = new Reservas;
-        
-      
+
         $dataHoraInicio = $this->ajusteData($this->request->post('data_hora_inicio')) ; 
         $dataHoraFim = $this->ajusteData($this->request->post('data_hora_fim')); 
         $representante = $this->request->post('nome_representante');
@@ -169,9 +168,7 @@ class SalasController extends Controller
                 $model->nome_representante = $representante;
                 $model->nome_equipe = $equipe;
                 $model->users_id = $userId;
-    
                 
-    
                 if ($model->save()) {
                     Yii::$app->session->setFlash('success', 'Reserva criada com sucesso.');
                 } else {

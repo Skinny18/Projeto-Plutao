@@ -2,7 +2,7 @@
 
 /** @var yii\web\View $this */
 
-$this->title = 'My Yii Application';
+$this->title = 'Plut-o';
 ?>
 <div class="site-index">
 
@@ -11,11 +11,8 @@ $this->title = 'My Yii Application';
     </div>
 
     <div class="body-content">
-
-        <div class="row">
-           
-            
-
+        <div class="" >
+            <h1>Sistema de Reservas de Sala</h1>
         </div>
 
     </div>

@@ -30,8 +30,8 @@ class Reservas extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [[ 'data_hora_inicio', 'data_hora_fim', 'nome_representante', 'nome_equipe'], 'required'],
-            [['id_reserva', 'id_sala', 'users_id', ], 'integer'],
+            [['data_hora_inicio', 'data_hora_fim', 'nome_representante', 'nome_equipe'], 'required'],
+            [['id_reserva', 'id_sala', 'users_id',], 'integer'],
             [['nome_representante', 'nome_equipe'], 'string'],
             [['data_hora_inicio', 'data_hora_fim'], 'safe'],
             [['id_reserva'], 'unique'],
@@ -68,20 +68,21 @@ class Reservas extends \yii\db\ActiveRecord
     {
         return $this->find()
             ->where(['id_sala' => $id_sala])
-            ->andWhere(['>', 'data_hora_fim', $dataHoraInicio]) 
-            ->andWhere(['<', 'data_hora_inicio', $dataHoraFim]) 
+            ->andWhere(['>', 'data_hora_fim', $dataHoraInicio])
+            ->andWhere(['<', 'data_hora_inicio', $dataHoraFim])
             ->exists();
     }
 
-    public function getAllReserve($id_sala){
+    public function getAllReserve($id_sala)
+    {
         return $this->find()->where(['id_sala' => $id_sala])->all();
     }
 
     public function getAvailable($id_sala)
     {
         $hoursAvailable = [];
-        for ($i = 1; $i <= 28; $i++){
-            for ($j = 6; $j <= 22; $j++){
+        for ($i = 1; $i <= 28; $i++) {
+            for ($j = 6; $j <= 22; $j++) {
                 $dataHora = "2024-02-${i} ${j}:00:00";
                 $reservado = $this->verifyExists($id_sala, $dataHora, $dataHora);
                 if ($reservado == false) {
@@ -97,20 +98,24 @@ class Reservas extends \yii\db\ActiveRecord
     {
         $hoursAvailable = [];
         $currentDate = date('Y-m-d');
-    
-        for ($j = 6; $j <= 22; $j++) {
-            $dataHora = "{$currentDate} {$j}:00:00";
+
+        for ($j = 6; $j <= 21; $j++) {
+            $dataHoraInicio = "{$currentDate} {$j}:00:00";
+            $dataHoraFim = "{$currentDate} " . ($j + 1) . ":00:00";
+
             $reservado = $this->find()->where(['id_sala' => $id_sala])
-            ->andWhere(['<', 'data_hora_fim', $dataHora])  // Verifica se a reserva termina antes do início
-            ->andWhere(['>', 'data_hora_inicio', $dataHora])  // Verifica se a reserva começa depois do término
-            ->exists();            
+                ->andWhere(['>', 'data_hora_fim', $dataHoraInicio])  // Verifica se a reserva termina após o início
+                ->andWhere(['<=', 'data_hora_inicio', $dataHoraFim])   // Verifica se a reserva começa antes ou exatamente no término
+                ->exists();
+
             if (!$reservado) {
-                $hoursAvailable[] = $dataHora;
+                $hoursAvailable[] = $dataHoraInicio;
             }
         }
-    
+
         return $hoursAvailable;
     }
+
 
 
     public function getLimitForUser($user)
@@ -123,45 +128,45 @@ class Reservas extends \yii\db\ActiveRecord
             ->andWhere(['>=', 'data_hora_inicio', $currentDate . ' 00:00:00'])
             ->andWhere(['<=', 'data_hora_fim', $currentDate . ' 23:59:59'])
             ->scalar();
-    
+
         $limiteDiario = 5;
         $horasDisponiveis = $limiteDiario - $reservasDoUsuario;
 
-        return $horasDisponiveis ;
-
+        return $horasDisponiveis;
     }
 
     public function getHoursReserve($user, $data_hora_fim, $data_hora_inicio)
     {
         $timestampFim = strtotime($data_hora_fim);
         $timestampInicio = strtotime($data_hora_inicio);
-    
+
         $diffInSeconds = $timestampFim - $timestampInicio;
         $diffInHours = $diffInSeconds / 3600;
-    
+
         return $diffInHours;
     }
+
+
 
 
 
     public function userReserve($id)
     {
         $user = User::findOne(['id' => $id]);
-        
+
         return $user->username;
     }
-    
+
 
     public function afterSave($insert, $changedAttributes)
     {
         $userId = Yii::$app->user->identity->id;
 
         $user =  User::findOne(['id' => $userId]);
-       
-        $user->limite_reservas = $user->limite_reservas - 1;
-        
-        $user->save();
 
+        $user->limite_reservas = $user->limite_reservas - 1;
+
+        $user->save();
     }
 
     public function afterDelete()
@@ -169,11 +174,10 @@ class Reservas extends \yii\db\ActiveRecord
         $userId = Yii::$app->user->identity->id;
 
         $user =  User::findOne(['id' => $userId]);
-       
-        $user->limite_reservas = $user->limite_reservas + 1;
-        
-        $user->save();
 
+        $user->limite_reservas = $user->limite_reservas + 1;
+
+        $user->save();
     }
 
     public function updateLimit()
@@ -183,10 +187,10 @@ class Reservas extends \yii\db\ActiveRecord
             // Verificar se é o primeiro dia do mês
             $currentDate = date('Y-m-d');
             $firstDayOfMonth = date('Y-m-01');
-            
+
             if ($currentDate == $firstDayOfMonth) {
                 // Resetar os limites para o novo mês
-                $user->limite_reservas = 30;  
+                $user->limite_reservas = 30;
                 $user->save();
             }
         }

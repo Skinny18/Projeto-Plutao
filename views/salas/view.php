@@ -24,6 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Reservar Sala
+</button>
+
     </p>
 
     <?= DetailView::widget([
@@ -36,11 +40,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'imagem_url:url',
         ],
     ]) ?> 
-<!-- <table class="table">
+ <table class="table">
 <thead>
     <tr>
         <th>#</th>
-        <th>Item</th>
+        <th>Horários Disponíveis</th>
     </tr>
 </thead>
 <tbody>
@@ -51,11 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </tr>
     <?php endforeach; ?>
 </tbody>
-</table> -->
+</table> 
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Reservar Sala
-</button>
 <?php
 $reserva;
 foreach ($reservas as $reserva) {

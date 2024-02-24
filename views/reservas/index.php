@@ -31,10 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id_reserva',
-            'id_sala',
             'data_hora_inicio',
             'data_hora_fim',
+            'nome_representante',
+            'nome_equipe',
+            [
+                'attribute' => 'user_id',
+                'value' => fn ($model) => $model->userReserve($model->users_id),
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Reservas $model, $key, $index, $column) {
@@ -43,6 +47,5 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]); ?>
-
 
 </div>
